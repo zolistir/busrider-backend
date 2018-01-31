@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-const jsonDir = './json';
+const jsonDir = 'json';
 
 /**
  * Creates a JSON object and writes it to a file
