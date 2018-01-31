@@ -38,7 +38,7 @@ var refreshRoutes = function() {
  * Get all the lines from local files
  */
 var getLines = function() {
-    var linesJSON = require('json/lines.json');
+    var linesJSON = require('./json/lines.json');
     return linesJSON;
 }
 
@@ -47,7 +47,7 @@ var getLines = function() {
  * @param {String} lineNumber - The line to fetch
  */
 var getLine = function(lineNumber) {
-    var linesJSON = require('json/' + lineNumber + '.json');
+    var linesJSON = require('./json/' + lineNumber + '.json');
     return linesJSON;
 }
 
