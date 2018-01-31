@@ -7,6 +7,7 @@
         "async-request": "^1.2.0",
         "cheerio": "^1.0.0-rc.2",
         "express": "^4.16.2",
+        "fs": "0.0.1-security",
         "promise": "^8.0.1",
         "promises-all": "^1.0.0",
         "request": "^2.83.0",
