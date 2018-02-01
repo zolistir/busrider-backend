@@ -2,8 +2,7 @@ var jsonUtil = require('./util/json');
 var htmlParse = require('./util/htmlParse');
 var fs = require('fs');
 var request = require('request');
-
-const url = require('url');
+var url = require('url');
 
 const ctpHost = 'ctpcj.ro';
 const ctpLinesPath = '/index.php/ro/orare-linii/linii-urbane';
@@ -38,8 +37,14 @@ var refreshRoutes = function() {
  * Get all the lines from local files
  */
 var getLines = function() {
-    var linesJSON = require('./json/lines.json');
-    return linesJSON;
+    return new Promise(function(resolve, reject) {
+        fs.readFile('./json/lines.json', (err, data) => {  
+            if (err) 
+                reject(err);
+            else
+                resolve(JSON.parse(data));
+        });
+    });
 }
 
 /**
@@ -47,8 +52,14 @@ var getLines = function() {
  * @param {String} lineNumber - The line to fetch
  */
 var getLine = function(lineNumber) {
-    var linesJSON = require('./json/' + lineNumber + '.json');
-    return linesJSON;
+    return new Promise(function(resolve, reject) {
+        fs.readFile('./json/' + lineNumber + '.json', (err, data) => {  
+            if (err) 
+                reject(err);
+            else
+                resolve(JSON.parse(data));
+        });
+    });
 }
 
 /**
