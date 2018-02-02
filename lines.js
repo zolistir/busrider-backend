@@ -38,8 +38,8 @@ var refreshRoutes = function() {
  */
 var getLines = function() {
     return new Promise(function(resolve, reject) {
-        fs.readFile('./json/lines.json', (err, data) => {  
-            if (err) 
+        fs.readFile('json/lines.json', (err, data) => {
+            if (err)
                 reject(err);
             else
                 resolve(JSON.parse(data));
@@ -53,8 +53,8 @@ var getLines = function() {
  */
 var getLine = function(lineNumber) {
     return new Promise(function(resolve, reject) {
-        fs.readFile('./json/' + lineNumber + '.json', (err, data) => {  
-            if (err) 
+        fs.readFile('json/' + lineNumber + '.json', (err, data) => {
+            if (err)
                 reject(err);
             else
                 resolve(JSON.parse(data));
