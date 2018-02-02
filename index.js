@@ -9,6 +9,7 @@ app.get('/lines', function(req, res) {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(linesJSON));
     }, function(err) {
+        console.log(err);
         res.status(404);
         res.send("There was an error retrieving the data");
     });
@@ -19,6 +20,7 @@ app.get('/lines/:lineNumber', function(req, res) {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(linesJSON));
     }, function(err) {
+        console.log(err);
         res.status(404);
         res.send("There was an error retrieving the data");
     });
