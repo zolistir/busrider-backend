@@ -3,6 +3,7 @@ var htmlParse = require('./util/htmlParse');
 var fs = require('fs');
 var request = require('request');
 var url = require('url');
+var lineService = require('./db/lineService');
 
 const ctpHost = 'ctpcj.ro';
 const ctpLinesPath = '/index.php/ro/orare-linii/linii-urbane';
@@ -29,7 +30,10 @@ var refreshRoutes = function() {
 
     request(options, function(error, response, body) {
         lines = htmlParse.parseLinesHTML(body);
-        jsonUtil.createJSON(lines, 'lines');
+        lineService.deleteLines();
+        lines.forEach(element => {
+            lineService.insertLine(element);
+        });
     });
 }
 
