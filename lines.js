@@ -3,6 +3,7 @@ var htmlParse = require('./util/htmlParse');
 var fs = require('fs');
 var request = require('request');
 var url = require('url');
+var lineService = require('./db/lineService');
 
 
 const ctpHost = 'ctpcj.ro';
@@ -20,7 +21,6 @@ var lines = [];
  * get their whole page with the current available lines and parse it.
  */
 var refreshRoutes = function() {
-    var lineObj = refreshLine(1);
     var options = {
         url: ctpLinesURL,
         headers: {
@@ -29,11 +29,16 @@ var refreshRoutes = function() {
     };
 
     request(options, function(error, response, body) {
-        lines = htmlParse.parseLinesHTML(body);
-        lineService.deleteLines();
-        lines.forEach(element => {
-            var lineId = lineService.insertLine(element);
-            var lineObj = refreshLine(element.lineNumber, lineId);
+        var lines = htmlParse.parseLinesHTML(body);
+        var del1 = lineService.deleteSchedules();
+        var del2 = lineService.deleteLines();
+        Promise.all([del1, del2]).then(function(values) {
+            lines.forEach(element => {
+                var linePromise = lineService.insertLine(element);
+                linePromise.then(function(lineId) {
+                    refreshLine(element.number, lineId);
+                });
+            });
         });
     });
 }
@@ -138,7 +143,6 @@ var refreshLine = function(lineNumber, lineId) {
     var req1 = requestLine(weekDaysURL, lineNumber);
     var req2 = requestLine(saturdayURL, lineNumber);
     var req3 = requestLine(sundayURL, lineNumber);
-
     Promise.all([req1, req2, req3]).then(function(values) {
         var weekdays = {};
         var saturday = {};
@@ -160,7 +164,7 @@ var refreshLine = function(lineNumber, lineId) {
         lineObj.weekdays = weekdays;
         lineObj.saturday = saturday;
         lineObj.sunday = sunday;
-        return lineObj;
+        lineService.insertSchedule(lineObj, lineId);
     });
 }
 
