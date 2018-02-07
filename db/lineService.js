@@ -45,12 +45,8 @@ var insertSchedule = function(lineSchedule, lineId) {
         line: lineId
     });
 
-    console.log(lineSchedule);
-    console.log(newLineLineSchedule);
-
     newLineLineSchedule.save(function(err) {
         if (err) throw err;
-        console.log('Schedule saved');
     });
 }
 
@@ -58,8 +54,40 @@ var deleteSchedules = function() {
     return new Promise(function(resolve, reject) {
         LineSchedule.remove({}, function(err) {
             if (err) throw err;
-            console.log('Schedules removed');
             resolve();
+        });
+    });
+}
+
+var getLines = function() {
+    return new Promise(function(resolve, reject) {
+        Line.find({}).select('number in_stop out_stop -_id').exec(function(err, lines) {
+            if (err) throw err;
+            resolve(lines);
+        });
+    });
+}
+
+var getLine = function(lineNumber) {
+    return new Promise(function(resolve, reject) {
+        var line = Line.find({ number: lineNumber.toUpperCase() }).select('number in_stop out_stop').exec(function(err, lines) {
+            if (err) reject(err);
+            var lineData = lines[0];
+            var schedule = LineSchedule.find({ line: lineData._id }).exec(function(err, lineSchedule) {
+                if (err) reject(err);
+                var scheduleData = lineSchedule[0];
+                var lineJSON = {
+                    number: lineData.number.toUpperCase(),
+                    in_stop: lineData.in_stop,
+                    out_stop: lineData.out_stop,
+                    schedule: {
+                        weekdays: scheduleData.weekdays,
+                        saturday: scheduleData.saturday,
+                        sunday: scheduleData.sunday
+                    }
+                }
+                resolve(lineJSON);
+            });
         });
     });
 }
@@ -68,5 +96,7 @@ module.exports = {
     insertLine: insertLine,
     deleteLines: deleteLines,
     insertSchedule: insertSchedule,
-    deleteSchedules: deleteSchedules
+    deleteSchedules: deleteSchedules,
+    getLines: getLines,
+    getLine: getLine
 }

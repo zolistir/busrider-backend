@@ -47,14 +47,8 @@ var refreshRoutes = function() {
  * Get all the lines from local files
  */
 var getLines = function() {
-    return new Promise(function(resolve, reject) {
-        fs.readFile('./json/lines.json', (err, data) => {
-            if (err)
-                reject(err);
-            else
-                resolve(JSON.parse(data));
-        });
-    });
+    var linesPromise = lineService.getLines();
+    return linesPromise;
 }
 
 /**
@@ -62,14 +56,8 @@ var getLines = function() {
  * @param {String} lineNumber - The line to fetch
  */
 var getLine = function(lineNumber) {
-    return new Promise(function(resolve, reject) {
-        fs.readFile('./json/' + lineNumber + '.json', (err, data) => {
-            if (err)
-                reject(err);
-            else
-                resolve(JSON.parse(data));
-        });
-    });
+    var linesPromise = lineService.getLine(lineNumber);
+    return linesPromise;
 }
 
 /**
