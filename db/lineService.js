@@ -70,7 +70,7 @@ var getLines = function() {
 
 var getLine = function(lineNumber) {
     return new Promise(function(resolve, reject) {
-        var line = Line.find({ number: lineNumber.toUpperCase() }).select('number in_stop out_stop').exec(function(err, lines) {
+        var line = Line.find({ number: lineNumber.toUpperCase() }).exec(function(err, lines) {
             if (err) reject(err);
             var lineData = lines[0];
             var schedule = LineSchedule.find({ line: lineData._id }).exec(function(err, lineSchedule) {
