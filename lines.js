@@ -3,6 +3,8 @@ var htmlParse = require('./util/htmlParse');
 var fs = require('fs');
 var request = require('request');
 var url = require('url');
+var lineService = require('./db/lineService');
+
 
 const ctpHost = 'ctpcj.ro';
 const ctpLinesPath = '/index.php/ro/orare-linii/linii-urbane';
@@ -19,7 +21,6 @@ var lines = [];
  * get their whole page with the current available lines and parse it.
  */
 var refreshRoutes = function() {
-
     var options = {
         url: ctpLinesURL,
         headers: {
@@ -28,8 +29,17 @@ var refreshRoutes = function() {
     };
 
     request(options, function(error, response, body) {
-        lines = htmlParse.parseLinesHTML(body);
-        jsonUtil.createJSON(lines, 'lines');
+        var lines = htmlParse.parseLinesHTML(body);
+        var del1 = lineService.deleteSchedules();
+        var del2 = lineService.deleteLines();
+        Promise.all([del1, del2]).then(function(values) {
+            lines.forEach(element => {
+                var linePromise = lineService.insertLine(element);
+                linePromise.then(function(lineId) {
+                    refreshLine(element.number, lineId);
+                });
+            });
+        });
     });
 }
 
@@ -37,14 +47,8 @@ var refreshRoutes = function() {
  * Get all the lines from local files
  */
 var getLines = function() {
-    return new Promise(function(resolve, reject) {
-        fs.readFile('./json/lines.json', (err, data) => {
-            if (err)
-                reject(err);
-            else
-                resolve(JSON.parse(data));
-        });
-    });
+    var linesPromise = lineService.getLines();
+    return linesPromise;
 }
 
 /**
@@ -52,14 +56,8 @@ var getLines = function() {
  * @param {String} lineNumber - The line to fetch
  */
 var getLine = function(lineNumber) {
-    return new Promise(function(resolve, reject) {
-        fs.readFile('./json/' + lineNumber + '.json', (err, data) => {
-            if (err)
-                reject(err);
-            else
-                resolve(JSON.parse(data));
-        });
-    });
+    var linesPromise = lineService.getLine(lineNumber);
+    return linesPromise;
 }
 
 /**
@@ -119,27 +117,26 @@ var requestLine = function(lineUrl, lineNumber) {
 
 /**
  * Call up the information from the CTP website for a certain line, and create a json file with the schedule arguments 
- * @param {String} lineNumber - The line number to refresh. Optional, if the parameter is missing it will refresh all of them
+ * @param {String} lineNumber - The line number to refresh
+ * @param {String} lineId - The line id to which to attach the information
+ * @return {Object} - An object containing the arrays with the schedules for the requested line
  */
-var refresh = function(lineNumber) {
+var refreshLine = function(lineNumber, lineId) {
     var csvURL = ctpLineURL.replace('{line_number}', lineNumber);
     var weekDaysURL = csvURL.replace('{type}', 'lv');
     var saturdayURL = csvURL.replace('{type}', 's');
     var sundayURL = csvURL.replace('{type}', 'd');
-    var lineJSON = {};
+    var lineObj = {};
 
     var req1 = requestLine(weekDaysURL, lineNumber);
     var req2 = requestLine(saturdayURL, lineNumber);
     var req3 = requestLine(sundayURL, lineNumber);
-
     Promise.all([req1, req2, req3]).then(function(values) {
         var weekdays = {};
         var saturday = {};
         var sunday = {};
 
         if (values[0] != '404') {
-            lineJSON.in_stop_name = values[0].in_stop_name;
-            lineJSON.out_stop_name = values[0].out_stop_name;
             weekdays.in_schedule = values[0].inSchedule;
             weekdays.out_schedule = values[0].outSchedule;
         }
@@ -152,16 +149,15 @@ var refresh = function(lineNumber) {
             sunday.out_schedule = values[2].outSchedule;
         }
 
-        lineJSON.weekdays = weekdays;
-        lineJSON.saturday = saturday;
-        lineJSON.sunday = sunday;
-        jsonUtil.createJSON(lineJSON, lineNumber);
+        lineObj.weekdays = weekdays;
+        lineObj.saturday = saturday;
+        lineObj.sunday = sunday;
+        lineService.insertSchedule(lineObj, lineId);
     });
 }
 
 module.exports = {
     refreshRoutes: refreshRoutes,
-    refresh: refresh,
     getLines: getLines,
     getLine: getLine
 }

@@ -11,7 +11,9 @@ var parseLinesHTML = function(linesHTML) {
     $('div.element', linesHTML).each(function(index, elem) {
         var line = {};
         line.number = $(elem).attr('data-title').split(' ')[1];
-        line.route = decode($('div.ruta', elem).html());
+        var routes = decode($('div.ruta', elem).html()).split(' - ');
+        line.in_stop = routes[0];
+        line.out_stop = routes[1];
         lines.push(line);
     });
     // TODO: Sort the lines
