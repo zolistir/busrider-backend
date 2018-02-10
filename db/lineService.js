@@ -2,7 +2,8 @@ var mongoose = require('mongoose');
 var Line = require('./line');
 var LineSchedule = require('./lineSchedule');
 
-const connectionString = 'mongodb://localhost/busrider';
+//const connectionString = 'mongodb://localhost/busrider';
+const connectionString = 'mongodb://busrider:hpJrxckspodSuSHz@ds131698.mlab.com:31698/heroku_rcrqfdqt';
 
 mongoose.connect(connectionString, function(err) {
     if (err)
