@@ -10,7 +10,14 @@ var parseLinesHTML = function(linesHTML) {
     var lines = [];
     $('div.element', linesHTML).each(function(index, elem) {
         var line = {};
-        line.number = $(elem).attr('data-title').split(' ')[1];
+        var lineNumber = '';
+        var lineArr = $(elem).attr('data-title').split(' ');
+        for (i = 1; i < lineArr.length; i++) {
+            if (i > 1)
+                lineNumber = lineNumber + ' ';
+            lineNumber = lineNumber + lineArr[i];
+        }
+        line.number = lineNumber;
         var routes = decode($('div.ruta', elem).html()).split(' - ');
         line.in_stop = routes[0];
         line.out_stop = routes[1];

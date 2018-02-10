@@ -5,14 +5,10 @@ var request = require('request');
 var url = require('url');
 var lineService = require('./db/lineService');
 
-
-const ctpHost = 'ctpcj.ro';
-const ctpLinesPath = '/index.php/ro/orare-linii/linii-urbane';
-const ctpScheduleCSVURL = '/orare/csv/orar_{line_number}_{type}.csv'; // e.g. /orare/csv/orar_24B_lv.csv
-const refererURL = 'http://ctpcj.ro/index.php/ro/orare-linii/linii-urbane/linia-';
-
-const ctpLinesURL = 'http://ctpcj.ro/index.php/ro/orare-linii/linii-urbane';
 const ctpLineURL = 'http://ctpcj.ro/orare/csv/orar_{line_number}_{type}.csv'; // e.g. /orare/csv/orar_24B_lv.csv
+const ctpLinesURL = 'http://ctpcj.ro/index.php/ro/orare-linii/linii-urbane';
+const ctpMetroLinesURL = 'http://ctpcj.ro/index.php/ro/orare-linii/linii-metropolitane';
+const ctpSupermarketLinesURL = 'http://ctpcj.ro/index.php/ro/orare-linii/linii-supermarket';
 
 var lines = [];
 
@@ -28,15 +24,57 @@ var refreshRoutes = function() {
         }
     };
 
+    var del1 = lineService.deleteSchedules();
+    var del2 = lineService.deleteLines();
+
     request(options, function(error, response, body) {
         var lines = htmlParse.parseLinesHTML(body);
-        var del1 = lineService.deleteSchedules();
-        var del2 = lineService.deleteLines();
         Promise.all([del1, del2]).then(function(values) {
             lines.forEach(element => {
                 var linePromise = lineService.insertLine(element);
                 linePromise.then(function(lineId) {
                     refreshLine(element.number, lineId);
+                });
+            });
+        });
+    });
+
+    options = {
+        url: ctpMetroLinesURL,
+        headers: {
+            'Content-Type': 'text/html'
+        }
+    };
+
+    request(options, function(error, response, body) {
+        var lines = htmlParse.parseLinesHTML(body);
+        Promise.all([del1, del2]).then(function(values) {
+            lines.forEach(element => {
+                var linePromise = lineService.insertLine(element);
+                linePromise.then(function(lineId) {
+                    refreshLine(element.number, lineId);
+                });
+            });
+        });
+    });
+
+    options = {
+        url: ctpSupermarketLinesURL,
+        headers: {
+            'Content-Type': 'text/html'
+        }
+    };
+
+    request(options, function(error, response, body) {
+        var lines = htmlParse.parseLinesHTML(body);
+        Promise.all([del1, del2]).then(function(values) {
+            lines.forEach(element => {
+                var linePromise = lineService.insertLine(element);
+                linePromise.then(function(lineId) {
+                    if (element.number == 'VIVO!')
+                        refreshLine('87B', lineId);
+                    else
+                        refreshLine(element.number.replace(' ', '').toLowerCase(), lineId);
                 });
             });
         });
@@ -95,6 +133,8 @@ var processLineData = function(lineData) {
  * @param {String} lineNumber - The line for which to get the schedule
  */
 var requestLine = function(lineUrl, lineNumber) {
+
+    // TODO: This accidentally works, but in the long run another solution is required
     var options = {
         url: lineUrl,
         headers: {
