@@ -16,7 +16,7 @@ app.get('/lines', function(req, res) {
 });
 
 app.get('/lines/:lineNumber', function(req, res) {
-    lines.getLine(req.params.lineNumber).then(function(linesJSON) {
+    lines.getLine(req.params.lineNumber.replace('-', ' ')).then(function(linesJSON) {
         res.setHeader('Content-Type', 'application/json');
         res.send(JSON.stringify(linesJSON));
     }, function(err) {

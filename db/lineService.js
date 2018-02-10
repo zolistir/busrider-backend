@@ -21,7 +21,6 @@ var insertLine = function(line) {
 
         newLine.save(function(err) {
             if (err) throw err;
-            console.log('Line saved');
             resolve(newLine._id);
         });
     });
@@ -31,7 +30,6 @@ var deleteLines = function() {
     return new Promise(function(resolve, reject) {
         Line.remove({}, function(err) {
             if (err) throw err;
-            console.log('Lines removed');
             resolve();
         });
     });
@@ -71,24 +69,29 @@ var getLines = function() {
 
 var getLine = function(lineNumber) {
     return new Promise(function(resolve, reject) {
-        var line = Line.find({ number: lineNumber.toUpperCase() }).exec(function(err, lines) {
+        var line = Line.find({ number: lineNumber }).exec(function(err, lines) {
             if (err) reject(err);
-            var lineData = lines[0];
-            var schedule = LineSchedule.find({ line: lineData._id }).exec(function(err, lineSchedule) {
-                if (err) reject(err);
-                var scheduleData = lineSchedule[0];
-                var lineJSON = {
-                    number: lineData.number.toUpperCase(),
-                    in_stop: lineData.in_stop,
-                    out_stop: lineData.out_stop,
-                    schedule: {
-                        weekdays: scheduleData.weekdays,
-                        saturday: scheduleData.saturday,
-                        sunday: scheduleData.sunday
+            if (lines.length > 0) {
+                var lineData = lines[0];
+                var schedule = LineSchedule.find({ line: lineData._id }).exec(function(err, lineSchedule) {
+                    if (err) reject(err);
+                    var scheduleData = lineSchedule[0];
+                    var lineJSON = {
+                        number: lineData.number.toUpperCase(),
+                        in_stop: lineData.in_stop,
+                        out_stop: lineData.out_stop,
+                        schedule: {
+                            weekdays: scheduleData.weekdays,
+                            saturday: scheduleData.saturday,
+                            sunday: scheduleData.sunday
+                        }
                     }
-                }
-                resolve(lineJSON);
-            });
+                    resolve(lineJSON);
+                });
+            } else {
+                resolve(lines);
+            }
+
         });
     });
 }
