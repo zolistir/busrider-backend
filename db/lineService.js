@@ -2,12 +2,12 @@ var mongoose = require('mongoose');
 var Line = require('./line');
 var LineSchedule = require('./lineSchedule');
 
-//const connectionString = 'mongodb://localhost/busrider';
-const connectionString = 'mongodb://busrider:hpJrxckspodSuSHz@ds131698.mlab.com:31698/heroku_rcrqfdqt';
-
+const connectionString = process.env.MONGODB_URI;
 mongoose.connect(connectionString, function(err) {
-    if (err)
+    if (err) {
+        console.log(err);
         throw err;
+    }
 });
 
 var insertLine = function(line) {
@@ -29,7 +29,10 @@ var insertLine = function(line) {
 var deleteLines = function() {
     return new Promise(function(resolve, reject) {
         Line.remove({}, function(err) {
-            if (err) throw err;
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
             resolve();
         });
     });
@@ -52,7 +55,10 @@ var insertSchedule = function(lineSchedule, lineId) {
 var deleteSchedules = function() {
     return new Promise(function(resolve, reject) {
         LineSchedule.remove({}, function(err) {
-            if (err) throw err;
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
             resolve();
         });
     });
@@ -61,7 +67,10 @@ var deleteSchedules = function() {
 var getLines = function() {
     return new Promise(function(resolve, reject) {
         Line.find({}).select('number in_stop out_stop -_id').exec(function(err, lines) {
-            if (err) throw err;
+            if (err) {
+                console.log(err);
+                reject(err);
+            }
             resolve(lines);
         });
     });
