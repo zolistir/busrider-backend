@@ -8,6 +8,7 @@ var lines = require('./lines');
 app.get('/lines', function(req, res) {
     lines.getLines().then(function(linesJSON) {
         res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.send(JSON.stringify(linesJSON));
     }, function(err) {
         console.log(err);
@@ -19,6 +20,7 @@ app.get('/lines', function(req, res) {
 app.get('/lines/:lineNumber', function(req, res) {
     lines.getLine(req.params.lineNumber.replace('-', ' ')).then(function(linesJSON) {
         res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.send(JSON.stringify(linesJSON));
     }, function(err) {
         console.log(err);

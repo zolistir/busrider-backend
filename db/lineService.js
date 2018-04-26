@@ -66,7 +66,7 @@ var deleteSchedules = function() {
 
 var getLines = function() {
     return new Promise(function(resolve, reject) {
-        Line.find({}).select('number in_stop out_stop -_id').exec(function(err, lines) {
+        Line.find({}).select('number in_stop out_stop -_id').sort({ number: 'asc' }).exec(function(err, lines) {
             if (err) {
                 console.log(err);
                 reject(err);
