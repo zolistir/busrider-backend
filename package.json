@@ -8,6 +8,7 @@
         "cheerio": "^1.0.0-rc.2",
         "dotenv": "^5.0.1",
         "express": "^4.16.2",
+        "hoek": "^5.0.3",
         "mongoose": "^5.0.3",
         "promise": "^8.0.1",
         "promises-all": "^1.0.0",
