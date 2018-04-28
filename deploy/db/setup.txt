@@ -1,0 +1,3 @@
+db.linetypes.insert({code: 'URBAN'});
+db.linetypes.insert({code: 'METROPOLITAN'});
+db.linetypes.insert({code: 'SUPERMARKET'});
