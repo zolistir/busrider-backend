@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Line = require('./line');
 var LineSchedule = require('./lineSchedule');
+var LineType = require('./lineType');
 
 const connectionString = process.env.MONGODB_URI;
 mongoose.connect(connectionString, function(err) {
@@ -16,7 +17,8 @@ var insertLine = function(line) {
             _id: new mongoose.Types.ObjectId(),
             number: line.number,
             in_stop: line.in_stop,
-            out_stop: line.out_stop
+            out_stop: line.out_stop,
+            type: line.type
         });
 
         newLine.save(function(err) {
@@ -66,7 +68,7 @@ var deleteSchedules = function() {
 
 var getLines = function() {
     return new Promise(function(resolve, reject) {
-        Line.find({}).select('number in_stop out_stop -_id').sort({ number: 'asc' }).exec(function(err, lines) {
+        Line.find({}).select('number in_stop out_stop -_id').populate('type', 'code -_id').sort({ number: 'asc' }).exec(function(err, lines) {
             if (err) {
                 console.log(err);
                 reject(err);
@@ -105,11 +107,21 @@ var getLine = function(lineNumber) {
     });
 }
 
+var getType = function(typeCode) {
+    return new Promise(function(resolve, reject) {
+        var lineType = LineType.find({ code: typeCode }).exec(function(err, lineType) {
+            if (err) reject(err);
+            resolve(lineType);
+        });
+    });
+}
+
 module.exports = {
     insertLine: insertLine,
     deleteLines: deleteLines,
     insertSchedule: insertSchedule,
     deleteSchedules: deleteSchedules,
     getLines: getLines,
-    getLine: getLine
+    getLine: getLine,
+    getType: getType
 }

@@ -29,8 +29,10 @@ var refreshRoutes = function() {
 
     request(options, function(error, response, body) {
         var lines = htmlParse.parseLinesHTML(body);
-        Promise.all([del1, del2]).then(function(values) {
+        var lineType = lineService.getType("URBAN");
+        Promise.all([lineType, del1, del2]).then(function(values) {
             lines.forEach(element => {
+                element.type = values[0][0].id;
                 var linePromise = lineService.insertLine(element);
                 linePromise.then(function(lineId) {
                     refreshLine(element.number, lineId);
@@ -48,8 +50,10 @@ var refreshRoutes = function() {
 
     request(options, function(error, response, body) {
         var lines = htmlParse.parseLinesHTML(body);
-        Promise.all([del1, del2]).then(function(values) {
+        var lineType = lineService.getType("METROPOLITAN");
+        Promise.all([lineType, del1, del2]).then(function(values) {
             lines.forEach(element => {
+                element.type = values[0][0].id;
                 var linePromise = lineService.insertLine(element);
                 linePromise.then(function(lineId) {
                     refreshLine(element.number, lineId);
@@ -67,8 +71,10 @@ var refreshRoutes = function() {
 
     request(options, function(error, response, body) {
         var lines = htmlParse.parseLinesHTML(body);
-        Promise.all([del1, del2]).then(function(values) {
+        var lineType = lineService.getType("SUPERMARKET");
+        Promise.all([lineType, del1, del2]).then(function(values) {
             lines.forEach(element => {
+                element.type = values[0][0].id;
                 var linePromise = lineService.insertLine(element);
                 linePromise.then(function(lineId) {
                     if (element.number == 'VIVO!')
