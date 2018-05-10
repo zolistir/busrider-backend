@@ -90,8 +90,12 @@ var refreshRoutes = function() {
 /**
  * Get all the lines from local files
  */
-var getLines = function() {
-    var linesPromise = lineService.getLines();
+var getLines = function(type) {
+    console.log(type);
+    if (typeof type === 'undefined')
+        var linesPromise = lineService.getLines();
+    else
+        var linesPromise = lineService.getLines(type);
     return linesPromise;
 }
 

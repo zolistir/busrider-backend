@@ -6,7 +6,11 @@ const PORT = process.env.PORT || 8080;
 var lines = require('./lines');
 
 app.get('/lines', function(req, res) {
-    lines.getLines().then(function(linesJSON) {
+    if (typeof req.query.type != 'undefined')
+        var result = lines.getLines(req.query.type);
+    else
+        var result = lines.getLines();
+    result.then(function(linesJSON) {
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.send(JSON.stringify(linesJSON));

@@ -66,13 +66,18 @@ var deleteSchedules = function() {
     });
 }
 
-var getLines = function() {
+var getLines = function(type) {
     return new Promise(function(resolve, reject) {
-        Line.find({}).select('number in_stop out_stop -_id').populate('type', 'code -_id').sort({ number: 'asc' }).exec(function(err, lines) {
+        if (typeof type === 'undefined')
+            var myQuery = Line.find({});
+        else
+            var myQuery = Line.find({ 'type': { 'code': type.toUpperCase() } });
+        myQuery.select('number in_stop out_stop -_id').populate('type', 'code -_id').sort({ number: 'asc' }).exec(function(err, lines) {
             if (err) {
                 console.log(err);
                 reject(err);
             }
+            console.log(lines);
             resolve(lines);
         });
     });
