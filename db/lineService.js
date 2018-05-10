@@ -68,17 +68,34 @@ var deleteSchedules = function() {
 
 var getLines = function(type) {
     return new Promise(function(resolve, reject) {
-        if (typeof type === 'undefined')
-            var myQuery = Line.find({});
-        else
-            var myQuery = Line.find({ 'type': { 'code': type.toUpperCase() } });
-        myQuery.select('number in_stop out_stop -_id').populate('type', 'code -_id').sort({ number: 'asc' }).exec(function(err, lines) {
-            if (err) {
-                console.log(err);
-                reject(err);
+
+        let myQueryPromise = new Promise(function(resolve, reject) {
+            if (typeof type === 'undefined')
+                resolve('');
+            else {            
+                LineType.find({ 'code': type.toUpperCase() }).exec(function(err, lineTypes) {
+                    if (err) {
+                        console.log(err);
+                        reject(err);
+                    }
+                    resolve(lineTypes[0]);
+                });
             }
-            console.log(lines);
-            resolve(lines);
+        });
+        
+        myQueryPromise.then(function(lineType) {
+            if (lineType !== '')
+                var myQuery = Line.find({ 'type': lineType});
+            else
+                var myQuery = Line.find({});
+                
+            myQuery.select('number in_stop out_stop -_id').populate('type', 'code -_id').sort({ number: 'asc' }).exec(function(err, lines) {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                resolve(lines);
+            });
         });
     });
 }
