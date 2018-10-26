@@ -125,8 +125,8 @@ var processLineData = function(lineData) {
     for (i = 5; i < linesArr.length; i++) {
         if (linesArr[i].length > 0) {
             var thisLine = linesArr[i].split(',');
-            inArr.push(thisLine[0]);
-            outArr.push(thisLine[1].replace('\r', ''));
+            thisLine[0] && inArr.push(thisLine[0]);
+            thisLine[1] && outArr.push(thisLine[1].replace('\r', ''));
         }
     }
 

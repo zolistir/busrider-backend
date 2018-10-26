@@ -7,13 +7,14 @@
         "async-request": "^1.2.0",
         "cheerio": "^1.0.0-rc.2",
         "dotenv": "^5.0.1",
-        "express": "^4.16.2",
-        "hoek": "^5.0.3",
-        "mongoose": "^5.0.3",
-        "promise": "^8.0.1",
+        "express": "^4.16.4",
+        "hoek": "^5.0.4",
+        "mongoose": "^5.3.7",
+        "promise": "^8.0.2",
         "promises-all": "^1.0.0",
-        "request": "^2.83.0",
-        "request-promise": "^4.2.2"
+        "request": "^2.88.0",
+        "request-promise": "^4.2.2",
+        "tough-cookie": "^2.4.3"
     },
     "devDependencies": {},
     "scripts": {
